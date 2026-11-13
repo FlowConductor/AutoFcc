@@ -229,6 +229,7 @@ async function load({ providersOnly = false } = {}) {
   await Promise.all([
     refreshConnectedAccounts(),
     hydrateModelOptions(),
+    hydrateFreeModels(),
     providersOnly ? window.CodeSessions.refresh() : window.CodeSessions.initialize(api),
   ]);
   if (state.config !== config) return;
@@ -1468,6 +1469,61 @@ async function hydrateModelOptions() {
   } catch {
     // Model fields remain editable when optional catalog hydration is unavailable.
   }
+}
+
+async function hydrateFreeModels() {
+  const list = byId("freeModelsList");
+  const meta = byId("freeModelsMeta");
+  if (!list || !meta) return;
+  try {
+    const payload = await api("/admin/api/free-models");
+    renderFreeModels(payload);
+  } catch (error) {
+    meta.textContent = `Free model list could not be loaded: ${error.message}`;
+    list.innerHTML = "";
+  }
+}
+
+function renderFreeModels(payload) {
+  const list = byId("freeModelsList");
+  const meta = byId("freeModelsMeta");
+  if (!list || !meta) return;
+  const models = payload.free_models || [];
+  const sources = (payload.sources || []).join(", ");
+  meta.textContent = `Last checked ${payload.last_checked || "unknown"} · ${models.length} free models · sources: ${sources}`;
+  list.innerHTML = "";
+  models.forEach((model) => {
+    const row = document.createElement("div");
+    row.className = "free-model-row";
+    const rank = document.createElement("span");
+    rank.className = "free-model-rank";
+    rank.textContent = `#${model.rank}`;
+    const body = document.createElement("div");
+    body.className = "free-model-body";
+    const title = document.createElement("strong");
+    title.textContent = model.display_name || model.model_id;
+    const provider = document.createElement("span");
+    provider.className = "free-model-provider";
+    provider.textContent = ` ${model.provider_label || model.provider_id} · ${model.model_id}`;
+    const limits = document.createElement("div");
+    limits.className = "free-model-limits";
+    limits.textContent = model.free_limits || "";
+    const badges = document.createElement("div");
+    badges.className = "free-model-badges";
+    const keyBadge = document.createElement("span");
+    keyBadge.className = "free-model-badge";
+    keyBadge.textContent = model.api_key_required ? "API key" : "no key";
+    badges.appendChild(keyBadge);
+    if (model.notes) {
+      const note = document.createElement("span");
+      note.className = "free-model-note";
+      note.textContent = model.notes;
+      badges.appendChild(note);
+    }
+    body.append(title, provider, limits, badges);
+    row.append(rank, body);
+    list.appendChild(row);
+  });
 }
 
 async function loadModelOptions(refresh = false) {

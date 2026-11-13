@@ -153,6 +153,16 @@ _PROVIDER_FIELD_OVERRIDES: dict[str, ProviderFieldOverride] = {
             "[OpenAI compatibility docs](https://console.groq.com/docs/openai)."
         ),
     },
+    "GMI_API_KEY": {
+        "label": "GMI Cloud API Key",
+        "description": (
+            "GMI Cloud Inference Engine API key ([console.gmicloud.ai]("
+            "https://console.gmicloud.ai/)); OpenAI-compatible endpoint at "
+            "[api.gmi-serving.com/v1](https://docs.gmicloud.ai/inference-engine/api-reference). "
+            "Free endpoints (e.g. MiniMax-M3, Llama 3.3 70B Instruct Turbo Free) "
+            "work without a credit card; models.dev also reads GMICLOUD_API_KEY."
+        ),
+    },
     "CLINE_API_KEY": {
         "label": "Cline API Key",
         "description": (

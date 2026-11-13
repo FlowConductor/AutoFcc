@@ -300,10 +300,160 @@ def load_cached_chain(path: Path) -> tuple[tuple[str, ...], float | None]:
     return tuple(chain), fetched_at
 
 
+class CuratedCodingSource:
+    """Kodlama odakli kuratoll siralama (core/data/coding_rank.json).
+
+    LMArena 'text' tahtasi GENEL sohbet zekasi siralar; kodlama isleri icin
+    coding guclu aileler (GLM, gpt-oss, Command A, DeepSeek, Qwen-coder...)
+    one cikarilmis listedir. Liste Free API Hunter tarafindan
+    guncellenebilir - ag gerektirmez, daima hazirdir.
+    """
+
+    name = "coding"
+
+    def __init__(self) -> None:
+        self._entries: tuple[RankedModel, ...] | None = None
+
+    def _load(self) -> tuple[RankedModel, ...]:
+        if self._entries is not None:
+            return self._entries
+        try:
+            raw = json.loads(
+                (
+                    Path(__file__).resolve().parent.parent
+                    / "core"
+                    / "data"
+                    / "coding_rank.json"
+                ).read_text(encoding="utf-8")
+            )
+            ranks = raw.get("ranks") or []
+            entries = tuple(
+                RankedModel(
+                    name=str(item["name"]),
+                    rank=int(item.get("rank", 999)),
+                    score=float(1000 - int(item.get("rank", 999))),
+                )
+                for item in ranks
+                if isinstance(item, dict) and item.get("name")
+            )
+        except Exception:
+            entries = ()
+        self._entries = entries
+        return self._entries
+
+    async def fetch(self, client: httpx.AsyncClient) -> tuple[RankedModel, ...]:
+        entries = self._load()
+        if not entries:
+            raise LeaderboardFetchError(
+                "coding_rank.json bos ya da okunamadi"
+            )
+        return entries
+
+
 def resolve_source(settings: Settings) -> LeaderboardSource:
+    if settings.auto_rank_source == "coding":
+        return CuratedCodingSource()
     if settings.auto_rank_source == "artificial_analysis":
         return ArtificialAnalysisSource(settings.artificial_analysis_api_key)
     return LMArenaSnapshotSource()
+
+
+# Providers whose entire API is a free tier (rate limits apply, no billing
+# wall). Every discovered model from these providers is a free candidate.
+FREE_TIER_PROVIDERS = frozenset(
+    {
+        "groq",
+        "cerebras",
+        "sambanova",
+        "nvidia_nim",
+        "mistral",
+        "cloudflare",
+        "huggingface",
+        "llm7",
+        "cohere",
+        "gmicloud",
+        "zai_api",
+        "ollama",
+        "lmstudio",
+        "llamacpp",
+    }
+)
+
+
+def excluded_providers_from(settings: Settings) -> tuple[str, ...]:
+    """Parse the comma-separated AUTO_RANK_EXCLUDED_PROVIDERS setting."""
+    raw = settings.auto_rank_excluded_providers or ""
+    return tuple(part.strip() for part in raw.split(",") if part.strip())
+
+
+# Sohbet olmayan model aileleri: zincirde olmalarinin tek anlami yok -
+# her istekte 400 dondurup zaman yakarlar. Model metadata'si
+# (input_modalities) kesin bilgi veriyorsa ona guvenilir; vermiyorsa
+# ad kalibindan taninir.
+NON_CHAT_MODEL_PATTERNS: tuple[str, ...] = (
+    "whisper",  # konusma-metin (STT)
+    "orpheus",  # metin-konusma (TTS)
+    "-tts",  # TTS modelleri
+    "tts-",
+    "playai-",
+    "prompt-guard",  # guardrail siniflandirici
+    "llama-guard",  # guvenlik siniflandirici
+    "safeguard",  # guvenlik modelleri
+    "moderation",
+    "omni-moderation",
+    "embed",  # gomme (embedding)
+    "bge-",  # ggme ailesi
+    "rerank",
+    "deplot",  # grafik-tablo cikarici
+    "grammar",
+    "distil-whisper",
+    "voxtral",  # ses isleme
+    "canary",  # ses kodlayici
+)
+
+_TEXT_INPUT_NOTE = "text"
+
+
+def chat_capable_model(info) -> bool:
+    """Bir kesfedilen model chat icin kullanilabilir mi?
+
+    Kesin bilgi varsa (input_modalities) metin girdisi istenir;
+    yoksa bilinen sohbet olmayan aile adlari elenir.
+    """
+    modalities = getattr(info, "input_modalities", None)
+    if modalities is not None:
+        return any(str(m.value) == _TEXT_INPUT_NOTE or str(m) == _TEXT_INPUT_NOTE for m in modalities)
+    model_id = str(getattr(info, "model_id", info))
+    lowered = model_id.split("/", 1)[-1].lower()
+    return not any(pattern in lowered for pattern in NON_CHAT_MODEL_PATTERNS)
+
+
+def filter_chain_refs(
+    refs: tuple[str, ...],
+    *,
+    free_only: bool,
+    excluded: tuple[str, ...] = (),
+) -> tuple[str, ...]:
+    """Drop non-free or excluded provider models from chain candidates."""
+    kept = tuple(
+        ref
+        for ref in refs
+        if ref.partition("/")[0] not in excluded
+        and (
+            not free_only
+            or ref.partition("/")[2].endswith(":free")
+            or ref.partition("/")[0] in FREE_TIER_PROVIDERS
+        )
+    )
+    dropped = len(refs) - len(kept)
+    if dropped:
+        logger.info(
+            "Auto-rank candidate filter: kept {} of {} refs (dropped {})",
+            len(kept),
+            len(refs),
+            dropped,
+        )
+    return kept
 
 
 async def fetch_ranked_models(
@@ -329,6 +479,18 @@ async def refresh_auto_rank_chain(
 
     if settings.model_routing != "auto":
         return None
+    excluded = excluded_providers_from(settings)
+    if settings.auto_rank_free_only or excluded:
+        provider_model_refs = filter_chain_refs(
+            provider_model_refs,
+            free_only=settings.auto_rank_free_only,
+            excluded=excluded,
+        )
+        if not provider_model_refs:
+            logger.warning(
+                "Auto-rank candidate filter removed every model; keeping previous"
+            )
+            return None
     try:
         ranked, source_name = await fetch_ranked_models(settings, client=client)
     except (httpx.HTTPError, LeaderboardFetchError, ValueError) as exc:
@@ -377,6 +539,14 @@ def restore_cached_chain(
         return existing
     path = cache_path if cache_path is not None else auto_rank_cache_path()
     chain, fetched_at = load_cached_chain(path)
+    if chain:
+        excluded = excluded_providers_from(settings)
+        if settings.auto_rank_free_only or excluded:
+            chain = filter_chain_refs(
+                chain,
+                free_only=settings.auto_rank_free_only,
+                excluded=excluded,
+            )
     if chain:
         auto_rank_chain.update(
             chain, source="cache", entry_count=0, fetched_at=fetched_at

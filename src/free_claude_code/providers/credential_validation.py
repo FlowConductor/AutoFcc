@@ -85,6 +85,7 @@ _PROBES = (
         _AUTH_401,
     ),
     _Probe("groq", "/models", _MODELS, _AUTH_401),
+    _Probe("gmicloud", "/models", _MODELS, _AUTH_401),
     _Probe("together", "/models", lambda p: isinstance(p, list), _AUTH_401),
     _Probe(
         "deepseek",

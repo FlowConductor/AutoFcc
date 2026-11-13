@@ -39,12 +39,63 @@
   `ARTIFICIAL_ANALYSIS_API_KEY`). The smartest available model serves first
   and the chain walks down as quotas run out. Rankings are cached in
   `~/.fcc/auto_rank_cache.json` and refreshed every
-  `AUTO_RANK_TTL_HOURS` (default 24).
+  `AUTO_RANK_TTL_HOURS` (default 24). For free-tier setups, set
+  `AUTO_RANK_FREE_ONLY=true` to keep only free models (`:free` models plus
+  free-tier providers like Groq, Cerebras, SambaNova, NVIDIA NIM, Mistral,
+  Cloudflare, Hugging Face, LLM7, Cohere, GMI Cloud) and
+  `AUTO_RANK_EXCLUDED_PROVIDERS=gemini,kilo` (comma-separated) to drop
+  providers whose free tier is unavailable for your account.
 - **Kilo.ai anonymous free tier.** Enable `KILO_ANONYMOUS=true` to use the
   Kilo gateway's `:free` models without any API key (per-IP rate limits).
 - **Session continuity.** Every request carries the full conversation, so
   switching models mid-session never loses state — the next model receives
   the complete transcript and output produced so far.
+- **🆓 Free models catalog.** The Admin UI's **Model Config** page now shows a
+  "Free models you can use" panel (smartest first) seeded from
+  [freeaiapi.org](https://freeaiapi.org/) and `docs/FREE_AI_APIS.md`, also
+  served at `GET /admin/api/free-models`. The data lives in
+  `src/free_claude_code/core/data/free_models.json` — update it as free tiers
+  change.
+- **⏱️ Provider-level quota tracking.** Free-tier limits are measured per
+  PROVIDER, not per model: documented limits (Groq 1,000 RPD, Cerebras 1M
+  TPD, LLM7 200 RPD, OpenRouter free 50 RPD, ...) live in
+  `application/provider_quota.py`; usage is persisted to
+  `~/.fcc/provider_usage.json` and resets daily at UTC midnight. When a
+  provider returns 402/429 or its documented limit is reached, every model
+  of that provider is skipped until the window resets — the chain moves to
+  the next provider instead of burning time on sibling models.
+- **💸 OpenRouter: $10 once → 1,000 free requests/day.** OpenRouter's `:free`
+  models start at 50 requests/day per key. A one-time $10 credit purchase
+  raises that to **1,000 requests/day for the lifetime of the account** — the
+  threshold counts credits bought all time, not your current balance. AutoFcc
+  cannot see the purchase, so raise the cap yourself with
+  `PROVIDER_DAILY_LIMIT_OVERRIDES=open_router=1000`. See
+  [Free-Tier Tips](#openrouter-one-time-10-unlocks-1000-free-requestsday).
+
+## Free-Tier Tips
+
+### OpenRouter: one-time $10 unlocks 1,000 free requests/day
+
+| Lifetime credits purchased | Free-model limits |
+| --- | --- |
+| under $10 | 20 requests/min, 50 requests/day |
+| $10 or more (counted all time, not current balance) | 20 requests/min, **1,000 requests/day** |
+| negative balance | HTTP 402 on every model, free ones included |
+
+The $10 threshold is cumulative and permanent: once you have bought $10 of
+credit in total, the 1,000/day tier stays even after that credit is spent. The
+daily counter still resets at midnight UTC, so it is 1,000 per day, not
+unlimited.
+
+AutoFcc ships the documented 50/day cap, so raise it after topping up:
+
+```bash
+PROVIDER_DAILY_LIMIT_OVERRIDES=open_router=1000
+```
+
+Set it in `~/.fcc/.env` or in the Admin UI under **Model Config → Provider
+Daily Limit Overrides**, then restart the server. The same variable works for
+any provider, for example `groq=2000,cerebras=5000`.
 
 ## What You Get
 
@@ -274,6 +325,7 @@ For another API endpoint, open **Providers → Custom providers → Add provider
 | [NVIDIA NIM](https://build.nvidia.com/settings/api-keys) | `NVIDIA_NIM_API_KEY` | `nvidia_nim/nvidia/nemotron-3-super-120b-a12b` |
 | [OpenRouter](https://openrouter.ai/keys) | `OPENROUTER_API_KEY` | `open_router/openrouter/free` |
 | [Groq](https://console.groq.com/keys) | `GROQ_API_KEY` | `groq/llama-3.3-70b-versatile` |
+| [GMI Cloud](https://console.gmicloud.ai/) | `GMI_API_KEY` | `gmicloud/Qwen/Qwen3.8-Max` (free endpoints: `gmicloud/MiniMaxAI/MiniMax-M3`, `gmicloud/meta-llama/Llama-3.3-70B-Instruct-Turbo-Free`) |
 | [ClinePass](https://docs.cline.bot/getting-started/clinepass) | `CLINE_API_KEY` | `cline_pass/cline-pass/kimi-k3` |
 | [OpenAI / ChatGPT](https://learn.chatgpt.com/docs/auth) | Connect ChatGPT in the Admin UI | `openai/<model-id>` |
 | [OpenAI API](https://platform.openai.com/api-keys) | `OPENAI_API_KEY` | `openai_api/gpt-5.6-sol` |

@@ -1,0 +1,26 @@
+{
+  "source": "kuratoll kodlama siralamasi (aider/SWE-bench bulgulari + gonul ruzgarin gunluk canli performansi)",
+  "note": "Free API Hunter bu listeyi guncelleyebilir. Siralama kodlama gucune gore: 1 = en iyi kodci. Eslestirme model adi tokenlari uzerinden yapilir.",
+  "ranks": [
+    {"name": "glm-5.3-flash", "rank": 1},
+    {"name": "glm-4.7-flash", "rank": 2},
+    {"name": "gpt-oss-120b", "rank": 3},
+    {"name": "command-a-plus", "rank": 4},
+    {"name": "command-a", "rank": 5},
+    {"name": "deepseek-v4", "rank": 6},
+    {"name": "deepseek-v4.1-flash", "rank": 7},
+    {"name": "qwen3.8-27b", "rank": 8},
+    {"name": "qwen3.5-coder", "rank": 9},
+    {"name": "nemotron-3-ultra", "rank": 10},
+    {"name": "dots-3-note", "rank": 11},
+    {"name": "north-mini-code", "rank": 12},
+    {"name": "glm-5.3", "rank": 13},
+    {"name": "gpt-oss-20b", "rank": 14},
+    {"name": "nemotron-3.5-super", "rank": 15},
+    {"name": "qwen3-max", "rank": 16},
+    {"name": "mistral-small", "rank": 17},
+    {"name": "gemma-4-31b", "rank": 18},
+    {"name": "inkling", "rank": 19},
+    {"name": "flint", "rank": 20}
+  ]
+}

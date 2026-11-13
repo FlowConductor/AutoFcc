@@ -10,6 +10,7 @@ from loguru import logger
 
 from free_claude_code.application.auto_rank import (
     auto_rank_chain,
+    chat_capable_model,
     refresh_auto_rank_chain,
     restore_cached_chain,
 )
@@ -396,8 +397,13 @@ class ProviderRuntimeManager:
 
         async def refresh() -> None:
             snapshot = generation.snapshot()
+            # Zincire SADECE chat modelleri girer: whisper/orpheus (TTS),
+            # prompt-guard (siniflandirici), gomme modelleri gibi chat
+            # olmayan adaylar her istekte 400 dondurup zaman yakar.
             refs = tuple(
-                info.model_id for info in snapshot.cached_prefixed_model_infos()
+                info.model_id
+                for info in snapshot.cached_prefixed_model_infos()
+                if chat_capable_model(info)
             )
             if not refs:
                 return

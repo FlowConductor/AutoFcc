@@ -77,6 +77,7 @@ ROUTING_FIELDS = (
     "auto_rank_ttl_hours",
     "failover_quota_cooldown_seconds",
     "failover_rate_limit_cooldown_seconds",
+    "provider_daily_limit_overrides",
 )
 REASONING_FIELDS = (
     "reasoning_policy",

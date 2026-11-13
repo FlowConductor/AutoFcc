@@ -19,6 +19,7 @@ from free_claude_code.application.connected_accounts import (
     ConnectedAccountLoginMode,
 )
 from free_claude_code.application.errors import ApplicationError
+from free_claude_code.application.free_models import load_free_models_payload
 from free_claude_code.application.model_catalog import read_model_catalog
 from free_claude_code.application.model_metadata import ProviderModelRefreshResult
 from free_claude_code.config.admin.custom_providers import CustomProviderMutation
@@ -257,6 +258,12 @@ async def models(
 ):
     require_loopback_admin(request)
     return _model_options(services)
+
+
+@router.get("/admin/api/free-models")
+async def free_models(request: Request):
+    require_loopback_admin(request)
+    return load_free_models_payload()
 
 
 @router.get("/admin/api/integrations/claude-vscode")

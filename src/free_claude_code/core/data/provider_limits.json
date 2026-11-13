@@ -1,0 +1,371 @@
+{
+  "generated_at": "2026-11-07T18:43:06",
+  "note": "Limitler kaynak sitelerden cekildi - SAGLAYICI (org) ve MODEL bazli olarak. AutoFcc org limitlerini pencere icin, model limitlerini daha sikis min() ile uygular; site verisi gercek davranisla celisirse yerel olcume gecer.",
+  "providers": {
+    "aion_labs": {
+      "rpm": 15,
+      "tpd": 20000,
+      "source_raw": "15 RPM, 20K TPD",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "aion-labs/aion-2.0": {
+          "rpm": 15,
+          "tpd": 20000
+        },
+        "aion-labs/aion-rp-llama-3.1-8b": {
+          "rpm": 15,
+          "tpd": 20000
+        },
+        "aion-labs/aion-3.0": {
+          "rpm": 15,
+          "tpd": 20000
+        },
+        "aion-labs/aion-3.0-mini": {
+          "rpm": 15,
+          "tpd": 20000
+        }
+      }
+    },
+    "cohere": {
+      "rpm": 20,
+      "source_raw": "20 RPM",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "Command A+ (218B)": {
+          "rpm": 20
+        },
+        "Command A (111B)": {
+          "rpm": 20
+        },
+        "Command R+": {
+          "rpm": 20
+        },
+        "Command R": {
+          "rpm": 20
+        },
+        "Command R7B": {
+          "rpm": 20
+        },
+        "Command A Reasoning": {
+          "rpm": 20
+        },
+        "Command A Translate": {
+          "rpm": 20
+        },
+        "Command A Vision": {
+          "rpm": 20
+        },
+        "Command R7B Arabic": {
+          "rpm": 20
+        },
+        "Aya Expanse 32B": {
+          "rpm": 20
+        },
+        "Aya Vision 32B": {
+          "rpm": 20
+        }
+      }
+    },
+    "mistral": {
+      "tpm": 500000,
+      "rpm": 60,
+      "source_raw": "~1 RPS, 500K TPM",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "Mistral Medium 3.5 (128B)": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Mistral Small 4": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Mistral Large 3": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Ministral 3 8B": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Codestral": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Ministral 3 3B": {
+          "tpm": 500000,
+          "rpm": 60
+        },
+        "Ministral 3 14B": {
+          "tpm": 500000,
+          "rpm": 60
+        }
+      }
+    },
+    "cloudflare": {
+      "neurons_per_day": 10000,
+      "source_raw": "10K neurons/day (shared)",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+          "neurons_per_day": 10000
+        },
+        "@cf/meta/llama-4-scout-17b-16e-instruct": {
+          "neurons_per_day": 10000
+        },
+        "@cf/openai/gpt-oss-120b": {
+          "neurons_per_day": 10000
+        },
+        "@cf/google/gemma-4-26b-a4b-it": {
+          "neurons_per_day": 10000
+        },
+        "@cf/zai-org/glm-4.7-flash": {
+          "neurons_per_day": 10000
+        },
+        "@cf/mistralai/mistral-small-3.1-24b-instruct": {
+          "neurons_per_day": 10000
+        },
+        "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
+          "neurons_per_day": 10000
+        },
+        "+ 55 more models": {
+          "neurons_per_day": 10000
+        }
+      }
+    },
+    "gonka": {
+      "monthly_tokens": 1000000,
+      "source_raw": "~1M tokens/month (shared, varies by model)",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "MiniMaxAI/MiniMax-M2.7": {
+          "monthly_tokens": 1000000
+        },
+        "deepseek-ai/DeepSeek-V4-Flash-0731": {
+          "monthly_tokens": 1000000
+        },
+        "zai-org/GLM-5.3-Flash": {
+          "monthly_tokens": 1000000
+        },
+        "BAAI/bge-m3": {
+          "monthly_tokens": 1000000
+        }
+      }
+    },
+    "groq": {
+      "rpm": 30,
+      "rpd": 1000,
+      "source_raw": "30 RPM, 1,000 RPD",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "openai/gpt-oss-120b": {
+          "rpm": 30,
+          "rpd": 1000
+        },
+        "openai/gpt-oss-20b": {
+          "rpm": 30,
+          "rpd": 1000
+        },
+        "qwen/qwen3.8-27b": {
+          "rpm": 30,
+          "rpd": 1000
+        }
+      }
+    },
+    "kilo": {
+      "rpd": 4800,
+      "rpm": 3,
+      "source_raw": "200 req/hr",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "nvidia/nemotron-3-ultra-550b-a55b:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "cohere/north-mini-code:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "openrouter/free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "nvidia/nemotron-3.5-lightning:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "kilo-auto/free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "dots-studio/dots-3-note-preview:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "nvidia/nemotron-3.5-super-vl:free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "reflection/beam-free": {
+          "rpd": 4800,
+          "rpm": 3
+        },
+        "stealth/glyph-cluster": {
+          "rpd": 4800,
+          "rpm": 3
+        }
+      }
+    },
+    "llm7": {
+      "rpm": 60,
+      "rpd": 6000,
+      "source_raw": "60 RPM, 250 req/hr (free token)",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "gpt-oss:20b": {
+          "rpm": 60,
+          "rpd": 6000
+        },
+        "mistral-Nemo-Instruct-2407": {
+          "rpm": 60,
+          "rpd": 6000
+        },
+        "nemotron-3-nano:30b": {
+          "rpm": 60,
+          "rpd": 6000
+        },
+        "codestral-latest": {
+          "rpm": 60,
+          "rpd": 6000
+        }
+      }
+    },
+    "modelscope": {
+      "rpd": 2000,
+      "source_raw": "2,000 RPD total; <=500 RPD/model (dynamic) | Dynamic quotas + dynamic concurrency",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "Qwen/Qwen3.5-35B-A3B": {
+          "rpd": 2000
+        },
+        "Qwen/Qwen3.5-27B": {
+          "rpd": 2000
+        }
+      }
+    },
+    "nvidia_nim": {
+      "rpm": 40,
+      "rpd": 10000,
+      "source_raw": "40 RPM, 10,000 RPD",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "google/gemma-4-31b-it": {
+          "rpm": 40,
+          "rpd": 10000
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b": {
+          "rpm": 40,
+          "rpd": 10000
+        },
+        "openai/gpt-oss-20b": {
+          "rpm": 40,
+          "rpd": 10000
+        },
+        "+ 92 more models": {
+          "rpm": 40,
+          "rpd": 10000
+        }
+      }
+    },
+    "open_router": {
+      "rpm": 20,
+      "rpd": 50,
+      "source_raw": "20 RPM, 50 RPD",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "cohere/north-mini-code:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "google/gemma-4-26b-a4b-it:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "google/gemma-4-31b-it:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "dots-studio/dots-3-note-preview:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "liquid/lfm-2.5-2.6b:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "nvidia/nemotron-3.5-lightning:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "recursive/flint-v1.0:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "xingchen-agi/xing4.0-29b-a4b:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "nvidia/nemotron-3.5-super-vl:free": {
+          "rpm": 20,
+          "rpd": 50
+        },
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+          "rpm": 20,
+          "rpd": 50
+        }
+      }
+    },
+    "ovhcloud": {
+      "rpm": 2,
+      "source_raw": "2 RPM (anonymous)",
+      "source": "mnfst/awesome-free-llm-apis",
+      "models": {
+        "Qwen3.5-397B-A17B": {
+          "rpm": 2
+        },
+        "gpt-oss-120b": {
+          "rpm": 2
+        },
+        "gpt-oss-20b": {
+          "rpm": 2
+        },
+        "Meta-Llama-3_3-70B-Instruct": {
+          "rpm": 2
+        },
+        "Qwen3.8-27B": {
+          "rpm": 2
+        },
+        "Qwen3.6-27B": {
+          "rpm": 2
+        },
+        "Qwen3.5-9B": {
+          "rpm": 2
+        },
+        "Qwen2.5-VL-72B-Instruct": {
+          "rpm": 2
+        },
+        "Mistral-Small-3.2-24B-Instruct": {
+          "rpm": 2
+        }
+      }
+    }
+  }
+}

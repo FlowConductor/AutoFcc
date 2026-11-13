@@ -1,0 +1,143 @@
+{
+  "last_checked": "2026-10-31",
+  "sources": [
+    "https://freeaiapi.org/",
+    "https://freeaiapi.org/provider/gmi-cloud",
+    "https://freeaiapi.org/provider/zhipu",
+    "https://freeaiapi.org/provider/empero",
+    "docs/FREE_AI_APIS.md (Free API Hunter ajanı tarafından her gün güncellenir)"
+  ],
+  "note": "rank = akıllılık sırası (1 = en akıllı). Limitler sağlayıcıya göre değişir; güncel değerler için kaynakları kontrol edin.",
+  "free_models": [
+    {
+      "rank": 2,
+      "provider_id": "gemini",
+      "provider_label": "Google AI Studio",
+      "model_id": "gemini-3.8-flash",
+      "display_name": "Gemini 3.8 Flash",
+      "free_limits": "~1.500 RPD, 1M TPM, 15 RPM; kart gerekmez; 1M context",
+      "api_key_required": true,
+      "notes": "Yeni projelerde 3.x modellere yönlendirilir; RPD gece yarısı Pasifik'te resetlenir"
+    },
+    {
+      "rank": 2.5,
+      "provider_id": "zai_api",
+      "provider_label": "Zhipu AI (BigModel)",
+      "model_id": "glm-4.7-flash",
+      "display_name": "GLM-4.7-Flash (Z.ai uluslararası)",
+      "free_limits": "Yeni hesap key ile ücretsiz — canlı doğrulandı 2026-11-01 (ZAI_API_KEY eklendi)",
+      "api_key_required": true,
+      "notes": "⚠️ glm-5.3-flash bu platformda PARALI (1113); bedava GLM-5.3-Flash yolları: chat.z.ai web sohbeti, ZCode günde 300M token (uygulama içi), BigModel.cn (Çin), Empero (bakımda)"
+    },
+    {
+      "rank": 3,
+      "provider_id": "gmicloud",
+      "provider_label": "GMI Cloud",
+      "model_id": "MiniMaxAI/MiniMax-M3",
+      "display_name": "MiniMax M3 (GMI Cloud free endpoint)",
+      "free_limits": "0-cost free endpoint, kart gerekmez; yerleşik `gmicloud` sağlayıcısı (GMI_API_KEY)",
+      "api_key_required": true,
+      "notes": "Aynı hub'da Llama 3.3 70B Instruct Turbo Free ve DeepSeek R1 Distill Llama 70B Free de var"
+    },
+    {
+      "rank": 4,
+      "provider_id": "nvidia_nim",
+      "provider_label": "NVIDIA NIM",
+      "model_id": "nvidia/nemotron-3-ultra",
+      "display_name": "Nemotron 3 Ultra (NVIDIA NIM)",
+      "free_limits": "Kayıtta 1.000 free inference kredisi; pratik ~40 RPM; 100+ open-weight model",
+      "api_key_required": true,
+      "notes": "OpenAI uyumlu: https://integrate.api.nvidia.com/v1"
+    },
+    {
+      "rank": 5,
+      "provider_id": "groq",
+      "provider_label": "Groq",
+      "model_id": "openai/gpt-oss-120b",
+      "display_name": "GPT-OSS 120B (Groq)",
+      "free_limits": "30 RPM, 1.000 RPD, 200K TPD; kart gerekmez",
+      "api_key_required": true,
+      "notes": "LPU üzerinde çok hızlı; limitler organizasyon bazlı"
+    },
+    {
+      "rank": 6,
+      "provider_id": "groq",
+      "provider_label": "Groq",
+      "model_id": "qwen/qwen3.8-27b",
+      "display_name": "Qwen 3.8 27B (Groq)",
+      "free_limits": "30 RPM; kart gerekmez (2026-10-31'de canlı doğrulandı)",
+      "api_key_required": true,
+      "notes": "Dikkat: Groq kataloğundan llama-3.3-70b-versatile kaldırıldı (model_not_found); güncel modeller: openai/gpt-oss-120b, gpt-oss-20b, qwen/qwen3.8-27b"
+    },
+    {
+      "rank": 7,
+      "provider_id": "open_router",
+      "provider_label": "OpenRouter (:free modeller)",
+      "model_id": "*:free",
+      "display_name": "OpenRouter :free kataloğu",
+      "free_limits": "20 RPM, 50 RPD (tek seferlik $10 sonrası 1.000 RPD); kart gerekmez",
+      "api_key_required": true,
+      "notes": "Model listesi sürekli değişir; güncel set: GET /api/v1/models (pricing=0)"
+    },
+    {
+      "rank": 8,
+      "provider_id": "cerebras",
+      "provider_label": "Cerebras Cloud",
+      "model_id": "gpt-oss-120b",
+      "display_name": "GPT-OSS 120B (Cerebras free trial)",
+      "free_limits": "5 RPM, 30K TPM, 1M TPD (Mayıs 2026'da düşürüldü)",
+      "api_key_required": true,
+      "notes": "Ücretsiz kotası trial niteliğinde; model listesi değişebilir"
+    },
+    {
+      "rank": 9,
+      "provider_id": "mistral",
+      "provider_label": "Mistral La Plateforme",
+      "model_id": "mistral-small-latest",
+      "display_name": "Mistral Small (free/experiment tier)",
+      "free_limits": "Experiment tier ~1B token/ay; veri eğitimine opt-in gerekir",
+      "api_key_required": true,
+      "notes": "Güncel kota La Plateforme üzerinden kontrol edilir"
+    },
+    {
+      "rank": 10,
+      "provider_id": "gmicloud",
+      "provider_label": "GMI Cloud",
+      "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-Free",
+      "display_name": "DeepSeek R1 Distill Llama 70B Free (GMI)",
+      "free_limits": "0-cost free endpoint, kart gerekmez",
+      "api_key_required": true,
+      "notes": "Yerleşik `gmicloud` sağlayıcısı üzerinden (GMI_API_KEY)"
+    },
+    {
+      "rank": 11,
+      "provider_id": "cloudflare",
+      "provider_label": "Cloudflare Workers AI",
+      "model_id": "@cf/meta/llama-3.1-8b-instruct-fast",
+      "display_name": "Llama 3.1 8B Instruct Fast (Workers AI)",
+      "free_limits": "Free tier ~10.000 neuron/gün (plan gereksinimini kontrol edin)",
+      "api_key_required": true,
+      "notes": "Edge inference için uygun"
+    },
+    {
+      "rank": 12,
+      "provider_id": "llm7",
+      "provider_label": "LLM7.io",
+      "model_id": "free catalog",
+      "display_name": "LLM7 free plan modelleri",
+      "free_limits": "~200 istek/gün free plan; tek key, kart gerekmez",
+      "api_key_required": true,
+      "notes": "DeepSeek, GLM, Qwen, Kimi vb. free katalog"
+    },
+    {
+      "rank": 13,
+      "provider_id": "huggingface",
+      "provider_label": "Hugging Face Inference Providers",
+      "model_id": "serverless free tier",
+      "display_name": "HF Inference Providers (free serverless)",
+      "free_limits": "Rate-limitli free tier; token ile",
+      "api_key_required": true,
+      "notes": "Binlerce open-source model; sağlayıcıya göre free/no-key opciones değişir"
+    }
+  ]
+}

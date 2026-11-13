@@ -36,6 +36,7 @@ from .failover import (
     order_candidates_by_cooldown,
 )
 from .ports import ModelInfoLookup, ProviderResolver
+from .provider_quota import provider_quota_tracker
 from .routing import (
     ProviderModelTarget,
     ResolvedModelRoute,
@@ -327,8 +328,22 @@ class ProviderExecutor:
         target: ProviderModelTarget,
         failure: ExecutionFailure,
     ) -> None:
-        """Record quota exhaustion so later requests skip this model first."""
+        """Record quota/access exhaustion so later requests skip smartly."""
 
+        # Saglayici seviyesinde her onemli hatayi olc: kota (402), rate (429)
+        # ve erisim (401/403) hatalari hesap/org bazli - ayni saglayicinin
+        # diger modellerini tekrar tekrar denemek zaman kaybidir.
+        if failure.status_code in (401, 402, 403, 429):
+            provider_quota_tracker.record_failure(
+                target.provider_id, status_code=failure.status_code
+            )
+        if failure.status_code == 404:
+            # olu model ID'si: bir kere isaretle, bir daha deneme
+            provider_quota_tracker.record_model_failure(
+                target.provider_id,
+                target.provider_model,
+                status_code=failure.status_code,
+            )
         if not is_quota_exhaustion_failure(failure):
             return
         cooldown = cooldown_seconds_for_failure(
@@ -367,14 +382,39 @@ class ProviderExecutor:
             self._failover,
             tuple(target.provider_model_ref for target in configured),
         )
-        if not cooling_refs or not healthy_refs:
+        # Saglayici kota filtresi: limiti dolan saglayicinin TUM modelleri
+        # zincirin sonuna ertelenir - ayni saglayiciyi tekrar denemek yerine
+        # siradaki saglayiciya gecilir.
+        available: list[ProviderModelTarget] = []
+        quota_deferred: list[ProviderModelTarget] = []
+        quota_reasons: dict[str, str | None] = {}
+        for target in configured:
+            ok, reason = provider_quota_tracker.provider_available(target.provider_id)
+            if ok:
+                available.append(target)
+            else:
+                quota_deferred.append(target)
+                quota_reasons[target.provider_id] = reason
+        if quota_deferred and available:
+            logger.info(
+                "Provider kota filtresi: {} saglayici atlandi ({})",
+                sorted(quota_reasons),
+                quota_reasons,
+            )
+        if not available:
+            # herkes limitte: yine de sirayla dene (kullaniciya hata donmek yerine)
             return configured
+        ordered = (*available, *quota_deferred)
+        if not cooling_refs or not healthy_refs:
+            return tuple(ordered)
         cooling = frozenset(cooling_refs)
         healthy = tuple(
-            target for target in configured if target.provider_model_ref not in cooling
+            target
+            for target in ordered
+            if target.provider_model_ref not in cooling
         )
         deferred = tuple(
-            target for target in configured if target.provider_model_ref in cooling
+            target for target in ordered if target.provider_model_ref in cooling
         )
         trace_event(
             stage="execution",
@@ -458,7 +498,27 @@ class ProviderExecutor:
             loop = asyncio.get_running_loop()
             progress_deadline = loop.time() + self._progress_timeout_seconds
             for index, target in enumerate(candidates):
+                # Istek sirasinda da olc: kotaya takilan/rate-limit olan
+                # saglayicinin zincirdeki DIGER modelleri denenmez; direkt
+                # siradaki saglayiciya atla (zaman kaybini onler).
+                candidate_available, skip_reason = (
+                    provider_quota_tracker.candidate_available(
+                        target.provider_id, target.provider_model
+                    )
+                )
+                if not candidate_available and index + 1 < len(candidates):
+                    logger.info(
+                        "Candidate atlandi (provider kota): provider={} model={} "
+                        "reason={}",
+                        target.provider_id,
+                        target.provider_model,
+                        skip_reason,
+                    )
+                    continue
                 record_request_route(target.provider_id, target.provider_model)
+                provider_quota_tracker.record_attempt(
+                    target.provider_id, target.provider_model
+                )
                 provider_stream: AsyncIterator[str] | None = None
                 candidate_committed = False
                 candidate_failure: ExecutionFailure | None = None
@@ -513,6 +573,7 @@ class ProviderExecutor:
                             continue
                         if not candidate_committed:
                             candidate_committed = True
+                            provider_quota_tracker.record_success(target.provider_id)
                             if index > 0:
                                 self._trace_fallback_selected(
                                     request_id=request_id,

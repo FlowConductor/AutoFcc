@@ -705,6 +705,14 @@ class ProviderAdmissionController:
         status: int | None,
     ) -> None:
         can_retry = execution.can_attempt
+        # Free-tier politikasi: 429 rate limit transport katmaninda
+        # YENIDEN DENENMEZ. Orijinal davranis (5x60sn probe) parali API'ler
+        # icin tasarlandi; free tier'da limit zaten bilinir ve kota takipcisi
+        # (provider_quota) saglayiciyi pencere boyunca atlar. Executor hemen
+        # siradaki saglayiciya gecer - ayni modelde 5 dakika beklenmez.
+        rate_limited_upstream = status == 429
+        if rate_limited_upstream:
+            can_retry = False
         delay = self._retry_delay(error, execution.attempts_started)
         became_leader = False
         exhausted_episode = False

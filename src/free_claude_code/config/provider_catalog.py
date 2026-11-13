@@ -45,6 +45,8 @@ GEMINI_DEFAULT_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
 # Vertex AI API root. The provider owns project/location endpoint composition.
 VERTEX_AI_API_ROOT = "https://aiplatform.googleapis.com"
 GROQ_DEFAULT_BASE = "https://api.groq.com/openai/v1"
+# GMI Cloud Inference Engine OpenAI-compatible Chat Completions API.
+GMICLOUD_DEFAULT_BASE = "https://api.gmi-serving.com/v1"
 # ClinePass subscription models through Cline's OpenAI-compatible API.
 CLINE_DEFAULT_BASE = "https://api.cline.bot/api/v1"
 CEREBRAS_DEFAULT_BASE = "https://api.cerebras.ai/v1"
@@ -173,6 +175,17 @@ PROVIDER_CATALOG: dict[str, ProviderDescriptor] = {
         credential_attr="groq_api_key",
         default_base_url=GROQ_DEFAULT_BASE,
         proxy_attr="groq_proxy",
+    ),
+    "gmicloud": ProviderDescriptor(
+        provider_id="gmicloud",
+        display_name="GMI Cloud",
+        website_url="https://www.gmicloud.ai/",
+        logo_filename="gmicloud.svg",
+        credential_env="GMI_API_KEY",
+        credential_url="https://console.gmicloud.ai/",
+        credential_attr="gmicloud_api_key",
+        default_base_url=GMICLOUD_DEFAULT_BASE,
+        proxy_attr="gmicloud_proxy",
     ),
     "cline_pass": ProviderDescriptor(
         provider_id="cline_pass",

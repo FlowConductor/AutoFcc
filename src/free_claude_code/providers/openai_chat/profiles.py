@@ -675,6 +675,15 @@ OPENAI_CHAT_PROFILES: dict[str, OpenAIChatProfile] = {
         ),
         ChatTemplateReasoning(field="enable_thinking"),
     ),
+    "gmicloud": OpenAIChatProfile(
+        _policy(
+            "GMICLOUD",
+            ReasoningReplayMode.REASONING_CONTENT,
+            default_max_tokens=ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS,
+        ),
+        NO_REASONING,
+        model_listing=OpenAIModelListing(path="/models"),
+    ),
     "llm7": OpenAIChatProfile(
         _policy(
             "LLM7",

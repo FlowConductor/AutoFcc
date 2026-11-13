@@ -16,3 +16,6 @@ llama_cache
 .smoke-results
 /test-results/
 .vscode
+
+# Generated task report (tools/dashboard.py --static)
+gorev-raporu.html

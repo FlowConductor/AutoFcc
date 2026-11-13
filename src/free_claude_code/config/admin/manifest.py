@@ -162,6 +162,7 @@ _NON_PROVIDER_FIELDS: tuple[ConfigFieldSpec, ...] = (
         settings_attr="auto_rank_source",
         options=(
             ConfigOptionSpec("lmarena", "Arena AI / LMArena (no key needed)"),
+            ConfigOptionSpec("coding", "Coding ranking (curated coding list)"),
             ConfigOptionSpec("artificial_analysis", "Artificial Analysis (API key)"),
         ),
         description=(
@@ -179,6 +180,32 @@ _NON_PROVIDER_FIELDS: tuple[ConfigFieldSpec, ...] = (
         description=(
             "How often the auto-ranked chain is rebuilt from leaderboard data "
             "when Model Routing is Auto."
+        ),
+    ),
+    ConfigFieldSpec(
+        key="AUTO_RANK_FREE_ONLY",
+        label="Auto Rank Free Models Only",
+        section_id="models",
+        field_type="boolean",
+        settings_attr="auto_rank_free_only",
+        description=(
+            "Keep only free-tier models in the auto-ranked chain: models ending "
+            "in ':free' plus providers whose whole API is a free tier (Groq, "
+            "Cerebras, SambaNova, NVIDIA NIM, Mistral, Cloudflare, Hugging "
+            "Face, LLM7, Cohere, GMI Cloud). Prevents the chain from trying "
+            "paid models that fail with 402."
+        ),
+    ),
+    ConfigFieldSpec(
+        key="AUTO_RANK_EXCLUDED_PROVIDERS",
+        label="Auto Rank Excluded Providers",
+        section_id="models",
+        field_type="text",
+        settings_attr="auto_rank_excluded_providers",
+        description=(
+            "Comma-separated provider IDs that are never allowed into the "
+            "auto-ranked chain (for example providers whose free tier is "
+            "unavailable for your account: gemini, kilo, nvidia_nim)."
         ),
     ),
     ConfigFieldSpec(
@@ -210,6 +237,19 @@ _NON_PROVIDER_FIELDS: tuple[ConfigFieldSpec, ...] = (
         description=(
             "How long a provider model that returned HTTP 429 is skipped before "
             "it is tried first again."
+        ),
+    ),
+    ConfigFieldSpec(
+        "PROVIDER_DAILY_LIMIT_OVERRIDES",
+        "Provider Daily Limit Overrides",
+        "models",
+        "text",
+        settings_attr="provider_daily_limit_overrides",
+        description=(
+            "Comma-separated provider=rpd pairs that override the documented "
+            "daily request caps, for example 'open_router=1000'. OpenRouter "
+            "raises its free-model cap from 50 to 1000 requests/day for good "
+            "after a one-time $10 credit purchase. Takes effect on restart."
         ),
     ),
     ConfigFieldSpec(

@@ -289,6 +289,11 @@ class Settings(BaseModel):
         default=None, validation_alias="GROQ_API_KEY"
     )
 
+    # ==================== GMI Cloud (OpenAI-compatible) ====================
+    gmicloud_api_key: OptionalNonEmptyString = Field(
+        default=None, validation_alias="GMI_API_KEY"
+    )
+
     # ==================== ClinePass (OpenAI-compatible) ====================
     cline_api_key: OptionalNonEmptyString = Field(
         default=None, validation_alias="CLINE_API_KEY"
@@ -465,6 +470,15 @@ class Settings(BaseModel):
         gt=0,
         validation_alias="AUTO_RANK_TTL_HOURS",
     )
+    # When true, the auto-ranked chain keeps only free-tier models:
+    # ':free' suffixed models plus providers whose whole API is a free tier.
+    auto_rank_free_only: bool = Field(
+        default=False, validation_alias="AUTO_RANK_FREE_ONLY"
+    )
+    # Comma-separated provider IDs never allowed into the auto-ranked chain.
+    auto_rank_excluded_providers: OptionalNonEmptyString = Field(
+        default=None, validation_alias="AUTO_RANK_EXCLUDED_PROVIDERS"
+    )
     artificial_analysis_api_key: OptionalNonEmptyString = Field(
         default=None,
         validation_alias="ARTIFICIAL_ANALYSIS_API_KEY",
@@ -482,6 +496,13 @@ class Settings(BaseModel):
         default=60,
         gt=0,
         validation_alias="FAILOVER_RATE_LIMIT_COOLDOWN_SECONDS",
+    )
+    # Per-provider daily request caps that override the documented catalog,
+    # e.g. "open_router=1000" after a one-time $10 OpenRouter credit purchase
+    # (the free-model cap rises from 50 to 1000 requests/day for good).
+    provider_daily_limit_overrides: OptionalNonEmptyString = Field(
+        default=None,
+        validation_alias="PROVIDER_DAILY_LIMIT_OVERRIDES",
     )
 
     # ==================== Per-Provider Proxy ====================
@@ -637,6 +658,9 @@ class Settings(BaseModel):
     )
     groq_proxy: OptionalNonEmptyString = Field(
         default=None, validation_alias="GROQ_PROXY"
+    )
+    gmicloud_proxy: OptionalNonEmptyString = Field(
+        default=None, validation_alias="GMI_PROXY"
     )
     cline_pass_proxy: OptionalNonEmptyString = Field(
         default=None, validation_alias="CLINE_PASS_PROXY"
@@ -886,11 +910,28 @@ class Settings(BaseModel):
     @field_validator("auto_rank_source")
     @classmethod
     def validate_auto_rank_source(cls, v: str) -> str:
-        if v not in ("lmarena", "artificial_analysis"):
+        if v not in ("lmarena", "coding", "artificial_analysis"):
             raise ValueError(
-                "AUTO_RANK_SOURCE must be 'lmarena' or 'artificial_analysis', "
-                f"got {v!r}"
+                "AUTO_RANK_SOURCE must be 'lmarena', 'coding', or "
+                f"'artificial_analysis', got {v!r}"
             )
+        return v
+
+    @field_validator("provider_daily_limit_overrides")
+    @classmethod
+    def validate_provider_daily_limit_overrides(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        for part in v.split(","):
+            entry = part.strip()
+            if not entry:
+                continue
+            provider, separator, limit = entry.partition("=")
+            if not separator or not provider.strip() or not limit.strip().isdigit():
+                raise ValueError(
+                    "PROVIDER_DAILY_LIMIT_OVERRIDES must look like "
+                    f"'provider=rpd,provider=rpd', got {entry!r}"
+                )
         return v
 
     @field_validator("messaging_rate_limit")

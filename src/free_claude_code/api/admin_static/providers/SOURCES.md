@@ -25,6 +25,7 @@ The LLaMA.cpp icon comes from the upstream llama.cpp repository; its MIT license
 | `gemini-color.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/gemini-color.svg |
 | `githubcopilot.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/githubcopilot.svg |
 | `groq.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/groq.svg |
+| `gmicloud.svg` | Original placeholder mark ("GMI" wordmark) created for this project; replace with the official GMI Cloud brand asset if preferred |
 | `huggingface-color.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/huggingface-color.svg |
 | `kilocode.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/kilocode.svg |
 | `kimi-color.svg` | https://unpkg.com/@lobehub/icons-static-svg@1.95.0/icons/kimi-color.svg |
